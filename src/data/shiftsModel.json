@@ -1,0 +1,22 @@
+[
+    {
+        "id": "1",
+        "name": "役員会",
+        "color": "bg-black dark:bg-white"
+    },
+    {
+        "id": "2",
+        "name": "朝礼",
+        "color": "bg-red-600"
+    },
+    {
+        "id": "3",
+        "name": "会議",
+        "color": "bg-blue-600"
+    },
+    {
+        "id": "4",
+        "name": "研修",
+        "color": "bg-green-600"
+    }
+]
