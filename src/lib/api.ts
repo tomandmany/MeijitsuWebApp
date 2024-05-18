@@ -1,15 +1,15 @@
-export async function fetchUsers() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_KEY}/users`);
+export async function fetchMembers() {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_KEY}/members`);
   if (!response.ok) {
-    throw new Error('Failed to fetch users');
+    throw new Error('Failed to fetch members');
   }
   return response.json();
 }
 
-export async function fetchUserShifts() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_KEY}/userShifts`);
+export async function fetchMemberShifts() {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_KEY}/memberShifts`);
   if (!response.ok) {
-    throw new Error('Failed to fetch user shifts');
+    throw new Error('Failed to fetch member shifts');
   }
   return response.json();
 }

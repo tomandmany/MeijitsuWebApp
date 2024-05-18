@@ -1,10 +1,10 @@
 import ShiftNameRaw from "@/app/shifts/components/ShiftNameRaw";
 import ShiftRaw from "@/app/shifts/components/ShiftRaw";
-import { fetchUsers, fetchUserShifts, fetchShiftsModel } from '@/lib/api';
+import { fetchMembers, fetchMemberShifts, fetchShiftsModel } from '@/lib/api';
 
 export default async function ShiftTable() {
-    const users = await fetchUsers();
-    const userShifts = await fetchUserShifts();
+    const users = await fetchMembers();
+    const userShifts = await fetchMemberShifts();
     const shiftsModel = await fetchShiftsModel();
 
     return (

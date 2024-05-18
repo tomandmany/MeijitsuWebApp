@@ -32,7 +32,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/api/members/route.ts",
+    "src/app/api/members.../route.ts",
     "src/app/shifts/components/useShiftSquare",
     "src/app/api/shiftsModel"
   ],
