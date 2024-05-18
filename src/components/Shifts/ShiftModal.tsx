@@ -14,8 +14,14 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
     const options = [];
     for (let hour = startHour; hour <= endHour; hour++) {
         for (let minute = 0; minute < 60; minute += interval) {
-            const time = `${hour}:${minute.toString().padStart(2, '0')}`;
-            options.push({ value: time, label: time });
+            if (hour !== 22) {
+                const time = `${hour}:${minute.toString().padStart(2, '0')}`;
+                options.push({ value: time, label: time });
+            } else {
+                const time = `${hour}:${minute.toString().padStart(2, '0')}`;
+                options.push({ value: time, label: time });
+                break;
+            }
         }
     }
     return options;
@@ -36,7 +42,7 @@ const shiftColorMapping: { [key: string]: string } = {
 };
 
 const startOptions = generateTimeOptions(7, 21, 15); // 7:00〜21:45
-const endOptions = generateTimeOptions(7, 21, 15).slice(1); // 7:15〜22:00
+const endOptions = generateTimeOptions(7, 22, 15); // 7:15〜22:00
 
 const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
     const { theme } = useTheme();
@@ -47,8 +53,8 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
 
     useEffect(() => {
         setName(shiftNameOptions.find(option => option.value === data.name) || null);
-        setStartTime({ value: data.startTime, label: data.startTime });
-        setEndTime({ value: data.endTime, label: data.endTime });
+        setStartTime(data.startTime ? { value: data.startTime, label: data.startTime } : null);
+        setEndTime(data.endTime ? { value: data.endTime, label: data.endTime } : null);
         setColor(data.color);
     }, [data]);
 
@@ -72,7 +78,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
     };
 
     const filteredEndOptions = endOptions.filter(option => {
-        if (!startTime) return true;
+        if (!startTime) return false;
         const [startHour, startMinute] = startTime.value.split(':').map(Number);
         const [endHour, endMinute] = option.value.split(':').map(Number);
         return endHour > startHour || (endHour === startHour && endMinute > startMinute);
@@ -106,6 +112,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                 backgroundColor: theme === 'dark' ? '#555' : '#eee',
                 cursor: 'pointer',
             },
+            opacity: state.isDisabled ? 0.5 : 1, // Disabled state visual indication
         }),
         singleValue: (provided) => ({
             ...provided,
@@ -128,7 +135,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
     return (
         <div className="fixed inset-0 flex justify-center items-center z-[9999]">
             <div className="fixed inset-0 bg-black/50 cursor-pointer z-[9998] modal-overlay" onClick={onClose}></div>
-            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow-lg z-[10000]" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-gray-800 p-4 min-w-96 rounded shadow-lg z-[10000]" onClick={(e) => e.stopPropagation()}>
                 <h2 className="text-xl mb-4 text-center text-black dark:text-white">シフト詳細</h2>
                 <div className="mb-4">
                     <label className="block mb-1 text-black dark:text-white">シフト名</label>
@@ -138,6 +145,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                         value={name}
                         onChange={handleNameChange}
                         menuPlacement="auto"
+                        placeholder="選択してください"
                     />
                 </div>
                 <div className="mb-4">
@@ -151,6 +159,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                             setEndTime(null);
                         }}
                         menuPlacement="auto"
+                        placeholder="選択してください"
                     />
                 </div>
                 <div className="mb-4">
@@ -162,6 +171,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                         onChange={(option) => setEndTime(option)}
                         menuPlacement="auto"
                         isDisabled={!startTime}
+                        placeholder={startTime ? "選択してください" : "先に開始時間を選択してください"}
                     />
                 </div>
                 <div className="flex justify-end">

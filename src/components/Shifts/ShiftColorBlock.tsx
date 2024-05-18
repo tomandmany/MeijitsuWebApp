@@ -16,7 +16,7 @@ const ShiftColorBlock = ({ width, left, color, name, onOpenModal }: ShiftColorBl
     return (
         <div
             onClick={() => onOpenModal(blockData)}
-            className={`absolute h-16 ${color} flex justify-center items-center px-2 text-center cursor-pointer ${nameColor}`}
+            className={`absolute h-16 ${color} flex justify-center items-center text-center cursor-pointer ${nameColor}`}
             style={{ width: `calc(${width}rem - 1px)`, left: `${left}rem` }}
         >
             {name}
