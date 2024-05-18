@@ -48,7 +48,7 @@ const ShiftColorBlock = ({ width, left, color, name, startTime, endTime, onOpenM
         <div
             onClick={handleClick}
             className={`absolute h-16 ${color} flex justify-center items-center px-2 text-center cursor-pointer ${nameColor}`}
-            style={{ width: `${width}rem`, left: `${left}rem` }}
+            style={{ width: `calc(${width}rem - 1px)`, left: `${left}rem` }}
         >
             {name}
         </div>

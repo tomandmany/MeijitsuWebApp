@@ -1,5 +1,5 @@
-import ShiftNameRaw from "@/components/Shifts/ShiftNameRaw";
-import ShiftRaw from "@/components/Shifts/ShiftRaw";
+import ShiftNameRaw from "@/app/shifts/components/ShiftNameRaw";
+import ShiftRaw from "@/app/shifts/components/ShiftRaw";
 import { fetchUsers, fetchUserShifts, fetchShiftsModel } from '@/lib/api';
 
 export default async function ShiftTable() {

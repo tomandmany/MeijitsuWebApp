@@ -33,8 +33,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/api/members/route.ts",
-    "src/components/Shifts/useShiftSquare"
-, "src/app/api/shiftsModel"  ],
+    "src/app/shifts/components/useShiftSquare",
+    "src/app/api/shiftsModel"
+  ],
   "exclude": [
     "node_modules"
   ]

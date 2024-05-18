@@ -1,10 +1,10 @@
-import ShiftTable from "@/components/Shifts/ShiftTable"
+import ShiftTable from "@/app/shifts/components/ShiftTable"
 
 const page = () => {
   return (
-      <main className="max-w-full flex min-h-screen justify-center items-center px-10 bg-orange-50 dark:bg-inherit">
-          <ShiftTable />
-      </main>
+    <main className="max-w-full flex min-h-screen justify-center items-center px-10 bg-orange-50 dark:bg-inherit">
+      <ShiftTable />
+    </main>
   )
 }
 
