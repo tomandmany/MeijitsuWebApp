@@ -27,6 +27,7 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBlock, setCurrentBlock] = useState<ShiftColorBlockType>({ name: '', startTime: '', endTime: '', color: '' });
   const [currentBlockIndex, setCurrentBlockIndex] = useState<{ userIndex: number; shiftIndex: number } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [combinedData, setCombinedData] = useState(() => {
     return users.map((user) => {
       const userShift = userShifts.filter((shift) => shift.user_id === user.id);
@@ -47,9 +48,10 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
     });
   });
 
-  const handleOpenModal = (blockData: ShiftColorBlockType, userIndex: number, shiftIndex: number) => {
+  const handleOpenModal = (blockData: ShiftColorBlockType, userIndex: number, shiftIndex: number, editing: boolean) => {
     setCurrentBlock(blockData);
     setCurrentBlockIndex({ userIndex, shiftIndex });
+    setIsEditing(editing);
     setIsModalOpen(true);
   };
 
@@ -62,15 +64,36 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
     setIsModalOpen(false);
   };
 
+  const handleAddShift = (startTime: string, userIndex: number) => {
+    const newShift: ShiftColorBlockType = {
+      name: '',
+      startTime,
+      endTime: '',
+      color: ''
+    };
+    setCurrentBlock(newShift);
+    setCurrentBlockIndex({ userIndex, shiftIndex: -1 }); // 新しいシフトの場合は shiftIndex を -1 に設定
+    setIsEditing(false);
+    setIsModalOpen(true);
+  };
+
+  const handleAddShiftSave = (data: ShiftColorBlockType) => {
+    if (currentBlockIndex !== null) {
+      const newBlocks = [...combinedData];
+      if (currentBlockIndex.shiftIndex === -1) {
+        newBlocks[currentBlockIndex.userIndex].shifts.push(data);
+      } else {
+        newBlocks[currentBlockIndex.userIndex].shifts[currentBlockIndex.shiftIndex] = data;
+      }
+      setCombinedData(newBlocks);
+    }
+    setIsModalOpen(false);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentBlockIndex(null);
-  };
-
-  const handleClickOutside = (e: any) => {
-    if (e.target.classList.contains('modal-overlay')) {
-      handleCloseModal();
-    }
+    setIsEditing(false);
   };
 
   return (
@@ -78,7 +101,7 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
       <ShiftTimeCell />
       {combinedData.map((user, userIndex) => (
         <div key={user.userId} className="flex items-center">
-          <ShiftCell>
+          <ShiftCell onAddShift={(startTime) => handleAddShift(startTime, userIndex)}>
             {user.shifts.map((block, shiftIndex) => {
               const { left, width } = calculateWidthAndLeft(block.startTime, block.endTime);
               return (
@@ -88,7 +111,9 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
                   left={left}
                   color={block.color}
                   name={block.name}
-                  onOpenModal={(blockData) => handleOpenModal(blockData, userIndex, shiftIndex)}
+                  startTime={block.startTime}
+                  endTime={block.endTime}
+                  onOpenModal={(blockData) => handleOpenModal(blockData, userIndex, shiftIndex, true)}
                 />
               );
             })}
@@ -97,12 +122,12 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
       ))}
       {isModalOpen && (
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-[9998] modal-overlay" onClick={handleClickOutside}></div>
           <ShiftModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             data={currentBlock}
-            onSave={handleSave}
+            onSave={isEditing ? handleSave : handleAddShiftSave}
+            isEditing={isEditing}
           />
         </>
       )}

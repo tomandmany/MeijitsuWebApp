@@ -1,20 +1,28 @@
 import ShiftSquare from "./ShiftSquare";
-import ShiftSquareGroup from "./ShiftSquareGroup";
+import ShiftSquarePair from "./ShiftSquarePair";
 
-const ShiftCellBase = () => {
+type ShiftCellBaseProps = {
+    addShift: (startTime: string) => void;
+};
+
+const ShiftCellBase = ({ addShift }: ShiftCellBaseProps) => {
+    const handleClick = (startTime: string) => {
+        addShift(startTime);
+    };
+
     return (
-        <div className="flex cursor-cell hover:bg-gray-500/30">
+        <div className="flex">
             <ShiftSquare />
-            <ShiftSquare isBorder />
+            <ShiftSquare isTime />
             {
-                Array.from({ length: 30 }).map((_, index) => (
-                    <ShiftSquareGroup key={index} />
+                Array.from({ length: 60 }).map((_, index) => (
+                    <ShiftSquarePair key={index} index={index} onClick={handleClick} isEven={(index + 1) % 2 === 0} />
                 ))
             }
             <ShiftSquare />
             <ShiftSquare />
         </div>
-    )
-}
+    );
+};
 
 export default ShiftCellBase;

@@ -1,10 +1,16 @@
 interface ShiftSquareProps {
-    isBorder?: boolean;
+    isTime?: boolean;
+    onClick?: (e: React.MouseEvent) => void;
 }
 
-const ShiftSquare = ({ isBorder }: ShiftSquareProps) => {
+const ShiftSquare = ({ isTime, onClick }: ShiftSquareProps) => {
+    const borderColor = isTime ? "border-r-gray-800 dark:border-r-gray-400" : "border-r-gray-300 dark:border-r-gray-700";
+
     return (
-        <div className={`min-w-4 h-16 flex items-end border-r last:border-r-0 ${isBorder ? "border-r-gray-600 dark:border-r-gray-400" : "dark:border-r-gray-800"}`}>
+        <div
+            className={`min-w-4 h-16 flex items-end border-r ${borderColor}`}
+            onClick={onClick}
+        >
         </div>
     );
 };
