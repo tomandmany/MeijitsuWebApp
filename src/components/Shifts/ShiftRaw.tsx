@@ -5,7 +5,7 @@ import ShiftCell from "./ShiftCell";
 import ShiftTimeCell from "./ShiftTimeCell";
 import ShiftModal from "./ShiftModal";
 import ShiftColorBlock from "./ShiftColorBlock";
-import { ShiftBlockData } from '@/types/shiftBlockData';  // 型定義のインポーネート
+import { ShiftColorBlockType } from '@/types/shiftColorBlockType';
 
 type ShiftRawProps = {
   users: { id: string, name: string }[];
@@ -25,18 +25,17 @@ const calculateWidthAndLeft = (startTime: string, endTime: string) => {
 
 const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentBlock, setCurrentBlock] = useState<ShiftBlockData>({ name: '', width: 0, left: 0, color: '' });
+  const [currentBlock, setCurrentBlock] = useState<ShiftColorBlockType>({ name: '', startTime: '', endTime: '', color: '' });
   const [currentBlockIndex, setCurrentBlockIndex] = useState<{ userIndex: number; shiftIndex: number } | null>(null);
   const [combinedData, setCombinedData] = useState(() => {
     return users.map((user) => {
       const userShift = userShifts.filter((shift) => shift.user_id === user.id);
       const shifts = userShift.map((shift) => {
         const shiftModel = shiftsModel.find((model) => model.id === shift.shift_id);
-        const { left, width } = calculateWidthAndLeft(shift.startTime, shift.endTime);
         return {
           name: shiftModel?.name || '',
-          width,
-          left,
+          startTime: shift.startTime,
+          endTime: shift.endTime,
           color: shiftModel?.color || ''
         };
       });
@@ -48,13 +47,13 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
     });
   });
 
-  const handleOpenModal = (blockData: ShiftBlockData, userIndex: number, shiftIndex: number) => {
+  const handleOpenModal = (blockData: ShiftColorBlockType, userIndex: number, shiftIndex: number) => {
     setCurrentBlock(blockData);
     setCurrentBlockIndex({ userIndex, shiftIndex });
     setIsModalOpen(true);
   };
 
-  const handleSave = (data: ShiftBlockData) => {
+  const handleSave = (data: ShiftColorBlockType) => {
     if (currentBlockIndex !== null) {
       const newBlocks = [...combinedData];
       newBlocks[currentBlockIndex.userIndex].shifts[currentBlockIndex.shiftIndex] = data;
@@ -80,16 +79,19 @@ const ShiftRaw = ({ users, userShifts, shiftsModel }: ShiftRawProps) => {
       {combinedData.map((user, userIndex) => (
         <div key={user.userId} className="flex items-center">
           <ShiftCell>
-            {user.shifts.map((block, shiftIndex) => (
-              <ShiftColorBlock
-                key={shiftIndex}
-                width={block.width}
-                left={block.left}
-                color={block.color}
-                name={block.name}
-                onOpenModal={(blockData) => handleOpenModal(blockData, userIndex, shiftIndex)}
-              />
-            ))}
+            {user.shifts.map((block, shiftIndex) => {
+              const { left, width } = calculateWidthAndLeft(block.startTime, block.endTime);
+              return (
+                <ShiftColorBlock
+                  key={shiftIndex}
+                  width={width}
+                  left={left}
+                  color={block.color}
+                  name={block.name}
+                  onOpenModal={(blockData) => handleOpenModal(blockData, userIndex, shiftIndex)}
+                />
+              );
+            })}
           </ShiftCell>
         </div>
       ))}

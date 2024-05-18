@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import Select, { StylesConfig, GroupBase, SingleValue } from 'react-select';
 import { useTheme } from 'next-themes';
-import { ShiftBlockData } from '@/types/shiftBlockData';  // 型定義のインポート
+import { ShiftColorBlockType } from '@/types/shiftColorBlockType';
 
 type ShiftModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    data: ShiftBlockData;
-    onSave: (data: ShiftBlockData) => void;
+    data: ShiftColorBlockType;
+    onSave: (data: ShiftColorBlockType) => void;
 };
 
 const generateTimeOptions = (startHour: number, endHour: number, interval: number) => {
@@ -40,15 +40,15 @@ const endOptions = generateTimeOptions(7, 21, 15).slice(1); // 7:15〜22:00
 
 const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
     const { theme } = useTheme();
-    const [name, setName] = useState<SingleValue<{ value: string, label: string }> | null>(null); // デフォルトは選択なし
-    const [startTime, setStartTime] = useState<SingleValue<{ value: string, label: string }> | null>(null); // デフォルトは選択なし
-    const [endTime, setEndTime] = useState<SingleValue<{ value: string, label: string }> | null>(null); // デフォルトは選択なし
+    const [name, setName] = useState<SingleValue<{ value: string, label: string }> | null>(null);
+    const [startTime, setStartTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
+    const [endTime, setEndTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
     const [color, setColor] = useState(data.color);
 
     useEffect(() => {
         setName(shiftNameOptions.find(option => option.value === data.name) || null);
-        setStartTime(null); // デフォルトは選択なし
-        setEndTime(null); // デフォルトは選択なし
+        setStartTime({ value: data.startTime, label: data.startTime });
+        setEndTime({ value: data.endTime, label: data.endTime });
         setColor(data.color);
     }, [data]);
 
@@ -62,13 +62,12 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
     const handleSubmit = () => {
         if (!name || !startTime || !endTime) return;
 
-        const [startHour, startMinute] = startTime.value.split(':').map(Number);
-        const [endHour, endMinute] = endTime.value.split(':').map(Number);
-
-        const left = ((startHour - 7) * 8) + (startMinute / 15 * 2) + 2;
-        const width = ((endHour - startHour) * 8) + ((endMinute - startMinute) / 15 * 2);
-
-        onSave({ name: name.value, width, left, color });
+        onSave({
+            name: name.value,
+            startTime: startTime.value,
+            endTime: endTime.value,
+            color
+        });
         onClose();
     };
 
@@ -139,7 +138,6 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                         value={name}
                         onChange={handleNameChange}
                         menuPlacement="auto"
-                        placeholder="シフト名を選択してください"
                     />
                 </div>
                 <div className="mb-4">
@@ -150,10 +148,9 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                         value={startTime}
                         onChange={(option) => {
                             setStartTime(option);
-                            setEndTime(null); // Reset end time when start time changes
+                            setEndTime(null);
                         }}
                         menuPlacement="auto"
-                        placeholder="開始時間を選択してください"
                     />
                 </div>
                 <div className="mb-4">
@@ -165,7 +162,6 @@ const ShiftModal = ({ isOpen, onClose, data, onSave }: ShiftModalProps) => {
                         onChange={(option) => setEndTime(option)}
                         menuPlacement="auto"
                         isDisabled={!startTime}
-                        placeholder="終了時間を選択してください"
                     />
                 </div>
                 <div className="flex justify-end">
