@@ -16,7 +16,7 @@ const ShiftSquarePair = ({ index, onClick, isEven }: ShiftSquarePairProps) => {
     };
 
     return (
-        <div className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/30" onClick={handleClick}>
+        <div className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/60" onClick={handleClick}>
             <ShiftSquare />
             <ShiftSquare isTime={isEven} />
         </div>
