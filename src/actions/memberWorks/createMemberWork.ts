@@ -1,5 +1,5 @@
 // パス: /actions/memberWorks/createMemberWork.ts
-'use server'
+'use server';
 
 import { supabase } from '@/lib/supabaseClient';
 import { TablesInsert } from '@/types/supabase.types';
@@ -22,10 +22,7 @@ export default async function createMemberWork(
 
   formData.forEach((value, key) => {
     if (key !== 'name' && key !== 'color') {
-      // nameとcolorを除外
-      newMemberWork[
-        key as keyof TablesInsert<'memberWorks'>
-      ] = value as any;
+      (newMemberWork as any)[key] = value as any;
     }
   });
 
