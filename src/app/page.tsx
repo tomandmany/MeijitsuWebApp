@@ -9,7 +9,7 @@ const page = () => {
                 <NameListIcon />
                 名簿
             </PageLinkCard>
-            <PageLinkCard url='shifts'>
+            <PageLinkCard url='works'>
                 <ShiftChartIcon />
                 シフト表
             </PageLinkCard>

@@ -1,12 +1,12 @@
-import ShiftSquare from "./ShiftSquare";
+import WorkSquare from "./WorkSquare";
 
-type ShiftSquarePairProps = {
+type WorkSquarePairProps = {
     index: number;
     onClick: (startTime: string) => void;
     isEven: boolean;
 };
 
-const ShiftSquarePair = ({ index, onClick, isEven }: ShiftSquarePairProps) => {
+const WorkSquarePair = ({ index, onClick, isEven }: WorkSquarePairProps) => {
     const handleClick = () => {
         const totalMinutes = index * 15;
         const startHour = Math.floor(totalMinutes / 60) + 7;
@@ -17,10 +17,10 @@ const ShiftSquarePair = ({ index, onClick, isEven }: ShiftSquarePairProps) => {
 
     return (
         <div className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/60" onClick={handleClick}>
-            <ShiftSquare />
-            <ShiftSquare isTime={isEven} />
+            <WorkSquare />
+            <WorkSquare isTime={isEven} />
         </div>
     );
 };
 
-export default ShiftSquarePair;
+export default WorkSquarePair;

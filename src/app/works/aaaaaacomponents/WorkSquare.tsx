@@ -1,9 +1,9 @@
-interface ShiftSquareProps {
+interface WorkSquareProps {
     isTime?: boolean;
     onClick?: (e: React.MouseEvent) => void;
 }
 
-const ShiftSquare = ({ isTime, onClick }: ShiftSquareProps) => {
+const WorkSquare = ({ isTime, onClick }: WorkSquareProps) => {
     const borderColor = isTime ? "border-r-gray-800 dark:border-r-gray-400" : "border-r-gray-300 dark:border-r-gray-700";
 
     return (
@@ -15,4 +15,4 @@ const ShiftSquare = ({ isTime, onClick }: ShiftSquareProps) => {
     );
 };
 
-export default ShiftSquare;
+export default WorkSquare;

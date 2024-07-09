@@ -1,4 +1,4 @@
-const ShiftTimeCell = () => {
+const WorkTimeRaw = () => {
   const timeList = [
     { beforeColon: '7', afterColon: '00' },
     { beforeColon: '7', afterColon: '30' },
@@ -47,4 +47,4 @@ const ShiftTimeCell = () => {
   );
 };
 
-export default ShiftTimeCell;
+export default WorkTimeRaw;

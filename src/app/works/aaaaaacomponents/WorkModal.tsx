@@ -1,13 +1,17 @@
+// パス: /components/WorkModal.tsx
+'use client';
+
 import { useState, useEffect } from 'react';
 import Select, { StylesConfig, GroupBase, SingleValue } from 'react-select';
 import { useTheme } from 'next-themes';
-import { ShiftColorBlockType } from '@/types/shiftColorBlockType';
+import createMemberWork from '@/actions/memberWorks/createMemberWork';
+import { getWorkModels } from '@/data/workModels';
 
-type ShiftModalProps = {
+type WorkModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    data: ShiftColorBlockType;
-    onSave: (data: ShiftColorBlockType) => void;
+    data: WorkBlock & { memberId: string }; // memberIdを追加
+    onSave: (data: WorkBlock) => void;
     isEditing: boolean;
 };
 
@@ -28,54 +32,77 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
     return options;
 };
 
-const shiftNameOptions = [
-    { value: '役員会', label: '役員会' },
-    { value: '朝礼', label: '朝礼' },
-    { value: '会議', label: '会議' },
-    { value: '研修', label: '研修' }
-];
-
-const shiftColorMapping: { [key: string]: string } = {
-    '役員会': 'bg-black dark:bg-white',
-    '朝礼': 'bg-red-600',
-    '会議': 'bg-blue-600',
-    '研修': 'bg-green-600'
-};
-
 const startOptions = generateTimeOptions(7, 21, 15); // 7:00〜21:45
 const endOptions = generateTimeOptions(7, 22, 15); // 7:15〜22:00
 
-const ShiftModal = ({ isOpen, onClose, data, onSave, isEditing }: ShiftModalProps) => {
+const WorkModal = ({ isOpen, onClose, data, onSave, isEditing }: WorkModalProps) => {
     const { theme } = useTheme();
-    const [name, setName] = useState<SingleValue<{ value: string, label: string }> | null>(null);
+    const [name, setName] = useState<SingleValue<{ value: string, label: string, id: string, color: string }> | null>(null);
     const [startTime, setStartTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
     const [endTime, setEndTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
-    const [color, setColor] = useState(data.color);
+    const [workModels, setWorkModels] = useState<{ value: string, label: string, color: string, id: string }[]>([]);
 
     useEffect(() => {
-        setName(shiftNameOptions.find(option => option.value === data.name) || null);
+        const fetchWorkModels = async () => {
+            const workModelsData = await getWorkModels();
+            const options = workModelsData.map((workModel: any) => ({
+                value: workModel.name,
+                label: workModel.name,
+                color: workModel.color,
+                id: workModel.id
+            }));
+            setWorkModels(options);
+        };
+
+        fetchWorkModels();
+    }, []);
+
+    useEffect(() => {
+        const selectedWorkModel = workModels.find(option => option.value === data.name);
+        setName(selectedWorkModel || null);
         setStartTime(isEditing ? { value: data.startTime, label: data.startTime } : { value: data.startTime, label: data.startTime });
         setEndTime(isEditing ? { value: data.endTime, label: data.endTime } : null);
-        setColor(data.color);
-    }, [data, isEditing]);
+    }, [data, isEditing, workModels]);
 
-    const handleNameChange = (option: SingleValue<{ value: string, label: string }> | null) => {
+    const handleNameChange = (option: SingleValue<{ value: string, label: string, id: string, color: string }> | null) => {
         setName(option);
-        if (option) {
-            setColor(shiftColorMapping[option.value]);
-        }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!name || !startTime || !endTime) return;
 
-        onSave({
-            name: name.value,
-            startTime: startTime.value,
-            endTime: endTime.value,
-            color
-        });
-        onClose();
+        const workModelId = name?.id || '';
+        const memberId = data.memberId || '';
+
+        console.log('workModelId:', workModelId);
+        console.log('memberId:', memberId);
+
+        if (!workModelId || !memberId) {
+            console.error('Invalid workModelId or memberId');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('startTime', startTime.value);
+        formData.append('endTime', endTime.value);
+        formData.append('workModelId', workModelId);
+        formData.append('memberId', memberId);
+
+        const response = await createMemberWork(formData);
+
+        if (response.success && response.data) {
+            onSave({
+                name: name.value,
+                startTime: startTime.value,
+                endTime: endTime.value,
+                color: name.color, // color を保持
+                workModelId: workModelId,
+                memberId: memberId
+            });
+            onClose();
+        } else {
+            console.error('Error saving member work:', response.error);
+        }
     };
 
     const filteredEndOptions = endOptions.filter(option => {
@@ -142,7 +169,7 @@ const ShiftModal = ({ isOpen, onClose, data, onSave, isEditing }: ShiftModalProp
                     <label className="block mb-1 text-black dark:text-white">シフト名</label>
                     <Select
                         styles={customStyles}
-                        options={shiftNameOptions}
+                        options={workModels}
                         value={name}
                         onChange={handleNameChange}
                         menuPlacement="auto"
@@ -188,4 +215,4 @@ const ShiftModal = ({ isOpen, onClose, data, onSave, isEditing }: ShiftModalProp
     );
 };
 
-export default ShiftModal;
+export default WorkModal;
