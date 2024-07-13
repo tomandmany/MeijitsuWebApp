@@ -11,7 +11,7 @@ const WorkNameRaw = ({ members }: WorkNameRawProps) => {
         名前
       </div>
       {members.map(member => (
-        <WorkNameCell key={member.id} name={member.name} />
+        <WorkNameCell key={member.id} name={member.name} createdAt={member.createdAt} />
       ))}
     </div>
   );
