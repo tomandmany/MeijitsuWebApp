@@ -15,7 +15,6 @@ export default async function updateMemberWork(
   formData: FormData
 ): Promise<Response> {
   const memberName = formData.get('memberName') as string;
-  // console.log('memberName:', memberName); // デバッグ用
   const { data: memberData, error: memberError } = await supabase
     .from('members')
     .select('id')
@@ -30,7 +29,6 @@ export default async function updateMemberWork(
   const memberId = memberData.id;
 
   const workName = formData.get('workName') as string;
-  // console.log('workName:', workName); // デバッグ用
   const { data: workModelData, error: workModelError } = await supabase
     .from('workModels')
     .select('id')
@@ -45,17 +43,6 @@ export default async function updateMemberWork(
 
   const startTime = formData.get('startTime') as string;
   const endTime = formData.get('endTime') as string;
-  // console.log('startTime:', startTime); // デバッグ用
-  // console.log('endTime:', endTime); // デバッグ用
-
-  // // ゼロパディング解除
-  // const formatTime = (time: string) => {
-  //   return time.startsWith('0') ? time.slice(1) : time;
-  // };
-  // const formattedStartTime = formatTime(startTime);
-  // const formattedEndTime = formatTime(endTime);
-  // console.log('formatted startTime:', formattedStartTime); // デバッグ用
-  // console.log('formatted endTime:', formattedEndTime); // デバッグ用
 
   const { data: memberWorkData, error: memberWorkError } = await supabase
     .from('memberWorks')
@@ -76,8 +63,6 @@ export default async function updateMemberWork(
   const updatedMemberWork: Omit<TablesUpdate<'memberWorks'>, 'createdAt'> = {
     workModelId: workModelId,
     memberId: memberId,
-    // startTime: formattedStartTime,
-    // endTime: formattedEndTime,
     startTime: startTime,
     endTime: endTime,
   };
@@ -85,8 +70,8 @@ export default async function updateMemberWork(
   const { data, error: updateError } = await supabase
     .from('memberWorks')
     .update(updatedMemberWork)
-    .eq('id', memberWorkData.id) // 更新対象のidを指定
-    .select() // 更新後のデータを取得
+    .eq('id', memberWorkData.id)
+    .select()
     .maybeSingle();
 
   if (updateError) {

@@ -13,13 +13,9 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
     const options = [];
     for (let hour = startHour; hour <= endHour; hour++) {
         for (let minute = 0; minute < 60; minute += interval) {
-            if (hour !== 22) {
+            if (hour !== 22 || minute === 0) {
                 const time = `${hour}:${minute.toString().padStart(2, '0')}`;
                 options.push({ value: time, label: time });
-            } else {
-                const time = `${hour}:${minute.toString().padStart(2, '0')}`;
-                options.push({ value: time, label: time });
-                break;
             }
         }
     }
@@ -28,6 +24,31 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
 
 const startOptions = generateTimeOptions(7, 21, 15); // 7:00〜21:45
 const endOptions = generateTimeOptions(7, 22, 15); // 7:15〜22:00
+
+const insertCurrentTime = (options: { value: string, label: string }[], currentTime: string) => {
+    if (!currentTime) return options;
+    const newOptions = [...options];
+    const exists = newOptions.some(option => option.value === currentTime);
+    if (!exists) {
+        const index = newOptions.findIndex(option => option.value > currentTime);
+        if (index === -1) {
+            newOptions.push({ value: currentTime, label: currentTime });
+        } else {
+            newOptions.splice(index, 0, { value: currentTime, label: currentTime });
+        }
+    }
+    return newOptions;
+};
+
+const filterStartOptions = (endTime: string) => {
+    const endIndex = endOptions.findIndex(option => option.value === endTime);
+    return startOptions.slice(0, endIndex);
+};
+
+const filterEndOptions = (startTime: string) => {
+    const startIndex = startOptions.findIndex(option => option.value === startTime);
+    return endOptions.slice(startIndex + 1);
+};
 
 const WorkModal = () => {
     const context = useContext(WorkContext);
@@ -157,24 +178,9 @@ const WorkModal = () => {
                         <label htmlFor="startTime" className="block mb-1 text-black dark:text-white">開始時間</label>
                         <select id="startTime" name="startTime" className="min-w-full" onChange={handleChange} value={formData.startTime}>
                             {
-                                currentStartTime
-                                    ?
-                                    <option value={currentStartTime}>{currentStartTime}</option>
-                                    :
-                                    <option value="">選択してください</option>
-                            }
-                            {
-                                currentStartTime
-                                    ?
-                                    startOptions
-                                        .filter((startOption) => startOption.label !== currentStartTime)
-                                        .map((startOption) => (
-                                        <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
-                                    ))
-                                    :
-                                    startOptions.map((startOption) => (
-                                        <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
-                                    ))
+                                insertCurrentTime(filterStartOptions(formData.endTime), currentStartTime).map((startOption) => (
+                                    <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
+                                ))
                             }
                         </select>
                     </div>
@@ -182,24 +188,9 @@ const WorkModal = () => {
                         <label htmlFor="endTime" className="block mb-1 text-black dark:text-white">終了時間</label>
                         <select id="endTime" name="endTime" className="min-w-full" onChange={handleChange} value={formData.endTime}>
                             {
-                                currentEndTime
-                                    ?
-                                    <option value={currentEndTime}>{currentEndTime}</option>
-                                    :
-                                    <option value="">選択してください</option>
-                            }
-                            {
-                                currentEndTime
-                                    ?
-                                    startOptions
-                                        .filter((endOption) => endOption.label !== currentEndTime)
-                                        .map((endOption) => (
-                                            <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
-                                        ))
-                                    :
-                                    endOptions.map((endOption) => (
-                                        <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
-                                    ))
+                                insertCurrentTime(filterEndOptions(formData.startTime), currentEndTime).map((endOption) => (
+                                    <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
+                                ))
                             }
                         </select>
                     </div>
