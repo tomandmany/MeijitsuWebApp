@@ -1,9 +1,10 @@
 import WorkNameRaw from "./WorkNameRaw";
 import WorkTimeRaw from "./WorkTimeRaw";
-import WorkBodyRaw from "./WorkBodyRaw";
+import WorkBody from "./WorkBody";
 import { getMembers } from "@/data/members";
 import { getMemberWorks } from "@/data/memberWorks";
 import { getWorkModels } from "@/data/workModels";
+import WorkProvider from "../contexts/WorkProvider";
 
 export default async function WorkTable() {
     const members = await getMembers();
@@ -15,7 +16,9 @@ export default async function WorkTable() {
             <WorkNameRaw members={members} />
             <div className="overflow-x-auto relative">
                 <WorkTimeRaw />
-                <WorkBodyRaw members={members} memberWorks={memberWorks} workModels={workModels} />
+                <WorkProvider members={members} memberWorks={memberWorks} workModels={workModels}>
+                    <WorkBody />
+                </WorkProvider>
             </div>
         </div>
     );

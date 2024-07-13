@@ -1,47 +1,37 @@
+// パス: /components/WorkSquarePair.tsx
+
 import { useContext } from "react";
-import WorkContext from "../context/WorkContext";
+import WorkContext from "../contexts/WorkContext";
 import WorkSquare from "./WorkSquare";
 
 type WorkSquarePairProps = {
     isBold: boolean;
+    memberName: string;
 };
-// type WorkSquarePairProps = {
-//     index: number;
-//     onClick: (startTime: string) => void;
-//     isBold: boolean;
-// };
 
-const WorkSquarePair = ({ isBold }: WorkSquarePairProps) => {
+const WorkSquarePair = ({ isBold, memberName }: WorkSquarePairProps) => {
     const context = useContext(WorkContext);
 
     if (!context) {
-        throw new Error('MyComponent must be used within a MyProvider');
+        throw new Error('WorkSquarePair must be used within a WorkProvider');
     }
 
-    const { handleOpenModal } = context;
+    const { handleOpenModal, setCurrentMemberName, setCurrentWorkName, setCurrentStartTime, setCurrentEndTime } = context;
+
+    const handleClick = () => {
+        setCurrentWorkName('');
+        setCurrentStartTime('');
+        setCurrentEndTime('');
+        setCurrentMemberName(memberName); // 現在のメンバー名を設定
+        handleOpenModal();
+    };
 
     return (
-        <button type="button" className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/60" onClick={handleOpenModal}>
+        <button type="button" className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/60" onClick={handleClick}>
             <WorkSquare />
             <WorkSquare isBold={isBold} />
         </button>
     );
 };
-// const WorkSquarePair = ({ index, onClick, isBold }: WorkSquarePairProps) => {
-    // const handleClick = () => {
-    //     const totalMinutes = index * 15;
-    //     const startHour = Math.floor(totalMinutes / 60) + 7;
-    //     const startMinute = totalMinutes % 60;
-    //     const startTime = `${startHour}:${startMinute.toString().padStart(2, '0')}`;
-    //     onClick(startTime);
-    // };
-
-//     return (
-//         <div className="flex cursor-cell hover:bg-black/10 dark:hover:bg-gray-500/60" onClick={handleClick}>
-//             <WorkSquare />
-//             <WorkSquare isTime={isBold} />
-//         </div>
-//     );
-// };
 
 export default WorkSquarePair;

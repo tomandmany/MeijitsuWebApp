@@ -1,19 +1,13 @@
 // パス: /components/WorkModal.tsx
-
 'use client'
 
-import { useContext } from "react";
-import WorkContext from "../context/WorkContext";
+import { useContext, useState, useEffect } from "react";
+import WorkContext from "../contexts/WorkContext";
 import { Button } from "@/components/ui/button";
 import createMemberWork from '@/actions/memberWorks/createMemberWork';
-
-// type WorkModalProps = {
-//     isOpen: boolean;
-//     onClose: () => void;
-//     data: WorkBlock & { memberId: string }; // memberIdを追加
-//     onSave: (data: WorkBlock) => void;
-//     isEditing: boolean;
-// };
+import updateMemberWork from '@/actions/memberWorks/updateMemberWork';
+import { X } from "lucide-react";
+import deleteMemberWork from "@/actions/memberWorks/deleteMemberWork";
 
 const generateTimeOptions = (startHour: number, endHour: number, interval: number) => {
     const options = [];
@@ -35,284 +29,217 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
 const startOptions = generateTimeOptions(7, 21, 15); // 7:00〜21:45
 const endOptions = generateTimeOptions(7, 22, 15); // 7:15〜22:00
 
-// const handleSubmit = async () => {
-//     if (!name || !startTime || !endTime) return;
-
-//     const workModelId = name?.id || '';
-//     const memberId = data.memberId || '';
-
-//     console.log('workModelId:', workModelId);
-//     console.log('memberId:', memberId);
-
-//     if (!workModelId || !memberId) {
-//         console.error('Invalid workModelId or memberId');
-//         return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append('startTime', startTime.value);
-//     formData.append('endTime', endTime.value);
-//     formData.append('workModelId', workModelId);
-//     formData.append('memberId', memberId);
-
-//     const response = await createMemberWork(formData);
-
-//     if (response.success && response.data) {
-//         onSave({
-//             name: name.value,
-//             startTime: startTime.value,
-//             endTime: endTime.value,
-//             color: name.color, // color を保持
-//             workModelId: workModelId,
-//             memberId: memberId
-//         });
-//         onClose();
-//     } else {
-//         console.error('Error saving member work:', response.error);
-//     }
-// };
-
 const WorkModal = () => {
     const context = useContext(WorkContext);
-
     if (!context) {
-        throw new Error('MyComponent must be used within a MyProvider');
+        throw new Error('WorkModal must be used within a WorkProvider');
+    }
+    const { workModels, handleCloseModal, currentMemberName, currentWorkName, currentStartTime, currentEndTime } = context;
+
+    const [formData, setFormData] = useState({
+        workName: "",
+        startTime: "",
+        endTime: ""
+    });
+
+    useEffect(() => {
+        if (currentWorkName && currentStartTime && currentEndTime) {
+            setFormData(prevState => ({ ...prevState, workName: currentWorkName, startTime: currentStartTime, endTime: currentEndTime }));
+        }
+    }, [currentWorkName, currentStartTime, currentEndTime]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({ ...prevState, [name]: value }));
+    };
+
+    const handleInsert = async () => {
+        const form = new FormData();
+        form.append('workName', formData.workName);
+        console.log('Inserting workName:', formData.workName);  // デバッグ用
+        form.append('startTime', formData.startTime);
+        form.append('endTime', formData.endTime);
+        form.append('memberName', currentMemberName); // メンバー名を追加
+
+        const response = await createMemberWork(form);
+        console.log('Server response:', response); // デバッグ用
+        if (response.success) {
+            // 成功した場合の処理
+        } else {
+            // 失敗した場合の処理
+        }
+
+        handleCloseModal();
+    };
+
+    const handleUpdate = async () => {
+        const form = new FormData();
+        form.append('workName', formData.workName);
+        console.log('Updating workName:', formData.workName);  // デバッグ用
+        form.append('startTime', formData.startTime);
+        form.append('endTime', formData.endTime);
+        form.append('memberName', currentMemberName); // メンバー名を追加
+
+        const response = await updateMemberWork(form);
+        console.log('Server response:', response); // デバッグ用
+        if (response.success) {
+            // 成功した場合の処理
+        } else {
+            // 失敗した場合の処理
+        }
+
+        handleCloseModal();
     }
 
-    const { workModels, handleCloseModal } = context;
+    const handleDelete = async () => {
+        const form = new FormData();
+        form.append('memberName', currentMemberName);
+        form.append('workName', formData.workName);
+        form.append('startTime', formData.startTime);
+        form.append('endTime', formData.endTime);
+
+        console.log('Deleting workName:', formData.workName);  // デバッグ用
+
+        const response = await deleteMemberWork(form);
+        console.log('Server response:', response); // デバッグ用
+        if (response.success) {
+            // 成功した場合の処理
+        } else {
+            // 失敗した場合の処理
+        }
+
+        handleCloseModal();
+    }
 
     return (
-        <form id="workModal" name="workModal" className="fixed inset-0 flex justify-center items-center z-[9999]" action={createMemberWork}>
+        <div className="fixed inset-0 flex justify-center items-center z-[9999]">
             <div className="fixed inset-0 bg-black/50 z-[9998] modal-overlay" onClick={handleCloseModal} />
-            <div className="bg-white dark:bg-gray-800 p-4 min-w-96 rounded shadow-lg z-[10000] flex flex-col gap-8" onClick={(e) => e.stopPropagation()}>
+            <div
+                className="bg-white dark:bg-gray-800 p-4 min-w-96 rounded shadow-lg z-[10000] flex flex-col gap-8 relative"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <h2 className="text-xl text-center text-black dark:text-white">シフト詳細</h2>
+                <Button
+                    type="button"
+                    variant='ghost'
+                    className="absolute right-[10px] top-[10px] dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 p-2"
+                    onClick={handleCloseModal}
+                >
+                    <X />
+                </Button>
                 <div className="flex flex-col gap-4">
                     <div>
                         <label htmlFor="workName" className="block mb-1 text-black dark:text-white">シフト名</label>
-                        <select id="workName" name="workName" className="min-w-full">
-                            <option value="">選択してください</option>
-                            {workModels.map((workModel) => (
-                                <option key={`${workModel.id + ' ' + workModel.name}`}>{workModel.name}</option>
-                            ))}
+                        <select id="workName" name="workName" className="min-w-full" onChange={handleChange} value={formData.workName}>
+                            {
+                                currentWorkName
+                                    ?
+                                    <option value={currentWorkName}>{currentWorkName}</option>
+                                    :
+                                    <option value="">選択してください</option>
+                            }
+                            {
+                                currentWorkName
+                                    ?
+                                    workModels
+                                        .filter((workModel) => workModel.name !== currentWorkName)
+                                        .map((workModel) => (
+                                            <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
+                                        ))
+                                    :
+                                    workModels.map((workModel) => (
+                                        <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
+                                    ))
+                            }
                         </select>
                     </div>
                     <div>
                         <label htmlFor="startTime" className="block mb-1 text-black dark:text-white">開始時間</label>
-                        <select id="startTime" name="startTime" className="min-w-full">
-                            <option value="">選択してください</option>
-                            {startOptions.map((startOption) => (
-                                <option key={startOption.label}>{startOption.value}</option>
-                            ))}
+                        <select id="startTime" name="startTime" className="min-w-full" onChange={handleChange} value={formData.startTime}>
+                            {
+                                currentStartTime
+                                    ?
+                                    <option value={currentStartTime}>{currentStartTime}</option>
+                                    :
+                                    <option value="">選択してください</option>
+                            }
+                            {
+                                currentStartTime
+                                    ?
+                                    startOptions
+                                        .filter((startOption) => startOption.label !== currentStartTime)
+                                        .map((startOption) => (
+                                        <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
+                                    ))
+                                    :
+                                    startOptions.map((startOption) => (
+                                        <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
+                                    ))
+                            }
                         </select>
                     </div>
                     <div>
                         <label htmlFor="endTime" className="block mb-1 text-black dark:text-white">終了時間</label>
-                        <select id="endTime" name="endTime" className="min-w-full">
-                            <option value="">選択してください</option>
-                            {endOptions.map((endOption) => (
-                                <option key={endOption.label}>{endOption.value}</option>
-                            ))}
+                        <select id="endTime" name="endTime" className="min-w-full" onChange={handleChange} value={formData.endTime}>
+                            {
+                                currentEndTime
+                                    ?
+                                    <option value={currentEndTime}>{currentEndTime}</option>
+                                    :
+                                    <option value="">選択してください</option>
+                            }
+                            {
+                                currentEndTime
+                                    ?
+                                    startOptions
+                                        .filter((endOption) => endOption.label !== currentEndTime)
+                                        .map((endOption) => (
+                                            <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
+                                        ))
+                                    :
+                                    endOptions.map((endOption) => (
+                                        <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
+                                    ))
+                            }
                         </select>
                     </div>
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-between gap-2">
                     <Button
                         type="button"
-                        className="bg-gray-500 hover:bg-gray-500/80 text-white px-4 py-2"
-                        onClick={handleCloseModal}
+                        variant='destructive'
+                        className="bg-red-600 hover:bg-red-700"
+                        onClick={handleDelete}
                     >
-                        戻る
+                        削除する
                     </Button>
-                    <Button
-                        type="button"
-                        className="bg-blue-500 hover:bg-blue-500/80 text-white px-4 py-2"
-                        onClick={handleCloseModal}
-                    >
-                        保存する
-                    </Button>
+                    {
+                        currentWorkName
+                            ?
+                            (
+                                <Button
+                                    type="button"
+                                    className="bg-blue-500 hover:bg-blue-500/80 text-white px-4 py-2"
+                                    onClick={handleUpdate}
+                                >
+                                    更新する
+                                </Button>
+                            )
+                            :
+                            (
+                                <Button
+                                    type="button"
+                                    className="bg-blue-500 hover:bg-blue-500/80 text-white px-4 py-2"
+                                    onClick={handleInsert}
+                                >
+                                    保存する
+                                </Button>
+                            )
+                    }
                 </div>
             </div>
-        </form>
+        </div >
     );
 };
-// const WorkModal = ({ isOpen, onClose, data, onSave, isEditing }: WorkModalProps) => {
-//     const { theme } = useTheme();
-//     const [name, setName] = useState<SingleValue<{ value: string, label: string, id: string, color: string }> | null>(null);
-//     const [startTime, setStartTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
-//     const [endTime, setEndTime] = useState<SingleValue<{ value: string, label: string }> | null>(null);
-//     const [workModels, setWorkModels] = useState<{ value: string, label: string, color: string, id: string }[]>([]);
-
-//     useEffect(() => {
-//         const fetchWorkModels = async () => {
-//             const workModelsData = await getWorkModels();
-//             const options = workModelsData.map((workModel: any) => ({
-//                 value: workModel.name,
-//                 label: workModel.name,
-//                 color: workModel.color,
-//                 id: workModel.id
-//             }));
-//             setWorkModels(options);
-//         };
-
-//         fetchWorkModels();
-//     }, []);
-
-//     useEffect(() => {
-//         const selectedWorkModel = workModels.find(option => option.value === data.name);
-//         setName(selectedWorkModel || null);
-//         setStartTime(isEditing ? { value: data.startTime, label: data.startTime } : { value: data.startTime, label: data.startTime });
-//         setEndTime(isEditing ? { value: data.endTime, label: data.endTime } : null);
-//     }, [data, isEditing, workModels]);
-
-//     const handleNameChange = (option: SingleValue<{ value: string, label: string, id: string, color: string }> | null) => {
-//         setName(option);
-//     };
-
-//     const handleSubmit = async () => {
-//         if (!name || !startTime || !endTime) return;
-
-//         const workModelId = name?.id || '';
-//         const memberId = data.memberId || '';
-
-//         console.log('workModelId:', workModelId);
-//         console.log('memberId:', memberId);
-
-//         if (!workModelId || !memberId) {
-//             console.error('Invalid workModelId or memberId');
-//             return;
-//         }
-
-//         const formData = new FormData();
-//         formData.append('startTime', startTime.value);
-//         formData.append('endTime', endTime.value);
-//         formData.append('workModelId', workModelId);
-//         formData.append('memberId', memberId);
-
-//         const response = await createMemberWork(formData);
-
-//         if (response.success && response.data) {
-//             onSave({
-//                 name: name.value,
-//                 startTime: startTime.value,
-//                 endTime: endTime.value,
-//                 color: name.color, // color を保持
-//                 workModelId: workModelId,
-//                 memberId: memberId
-//             });
-//             onClose();
-//         } else {
-//             console.error('Error saving member work:', response.error);
-//         }
-//     };
-
-//     const filteredEndOptions = endOptions.filter(option => {
-//         if (!startTime) return false;
-//         const [startHour, startMinute] = startTime.value.split(':').map(Number);
-//         const [endHour, endMinute] = option.value.split(':').map(Number);
-//         return endHour > startHour || (endHour === startHour && endMinute > startMinute);
-//     });
-
-//     if (!isOpen) return null;
-
-//     const customStyles: StylesConfig<any, false, GroupBase<any>> = {
-//         control: (provided, state) => ({
-//             ...provided,
-//             backgroundColor: theme === 'dark' ? '#333' : '#fff',
-//             color: theme === 'dark' ? '#fff' : '#000',
-//             borderColor: theme === 'dark' ? '#444' : '#ccc',
-//             boxShadow: state.isFocused ? (theme === 'dark' ? '0 0 0 1px #555' : '0 0 0 1px #aaa') : provided.boxShadow,
-//             '&:hover': {
-//                 borderColor: state.isFocused ? (theme === 'dark' ? '#555' : '#aaa') : (theme === 'dark' ? '#444' : '#ccc'),
-//                 cursor: 'pointer',
-//             },
-//         }),
-//         menu: (provided) => ({
-//             ...provided,
-//             backgroundColor: theme === 'dark' ? '#333' : '#fff',
-//         }),
-//         option: (provided, state) => ({
-//             ...provided,
-//             backgroundColor: state.isSelected
-//                 ? (theme === 'dark' ? '#444' : '#ddd')
-//                 : (theme === 'dark' ? '#333' : '#fff'),
-//             color: theme === 'dark' ? '#fff' : '#000',
-//             '&:hover': {
-//                 backgroundColor: theme === 'dark' ? '#555' : '#eee',
-//                 cursor: 'pointer',
-//             },
-//             opacity: !startTime ? 0.5 : 1, // Disabled state visual indication
-//         }),
-//         singleValue: (provided) => ({
-//             ...provided,
-//             color: theme === 'dark' ? '#fff' : '#000',
-//         }),
-//         dropdownIndicator: (provided, state) => ({
-//             ...provided,
-//             color: theme === 'dark' ? '#aaa' : '#555',
-//             '&:hover': {
-//                 color: theme === 'dark' ? '#ccc' : '#777',
-//                 cursor: 'pointer',
-//             },
-//         }),
-//         indicatorSeparator: (provided) => ({
-//             ...provided,
-//             backgroundColor: theme === 'dark' ? '#444' : '#ccc',
-//         }),
-//     };
-
-//     return (
-//         <div className="fixed inset-0 flex justify-center items-center z-[9999]">
-//             <div className="fixed inset-0 bg-black/50 cursor-pointer z-[9998] modal-overlay" onClick={onClose}></div>
-//             <div className="bg-white dark:bg-gray-800 p-4 min-w-96 rounded shadow-lg z-[10000]" onClick={(e) => e.stopPropagation()}>
-//                 <h2 className="text-xl mb-4 text-center text-black dark:text-white">シフト詳細</h2>
-//                 <div className="mb-4">
-//                     <label className="block mb-1 text-black dark:text-white">シフト名</label>
-//                     <Select
-//                         styles={customStyles}
-//                         options={workModels}
-//                         value={name}
-//                         onChange={handleNameChange}
-//                         menuPlacement="auto"
-//                         placeholder="選択してください"
-//                     />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label className="block mb-1 text-black dark:text-white">開始時間</label>
-//                     <Select
-//                         styles={customStyles}
-//                         options={startOptions}
-//                         value={startTime}
-//                         onChange={(option) => {
-//                             setStartTime(option);
-//                             if (startTime && endTime) {
-//                                 if (endTime.value <= option!.value) {
-//                                     setEndTime(null);
-//                                 }
-//                             }
-//                         }}
-//                         menuPlacement="auto"
-//                         placeholder="選択してください"
-//                     />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label className="block mb-1 text-black dark:text-white">終了時間</label>
-//                     <Select
-//                         styles={customStyles}
-//                         options={filteredEndOptions}
-//                         value={endTime}
-//                         onChange={(option) => setEndTime(option)}
-//                         menuPlacement="auto"
-//                         isDisabled={!startTime}
-//                         placeholder="選択してください"
-//                     />
-//                 </div>
-//                 <div className="flex justify-end">
-//                     <button className="bg-gray-500 text-white px-4 py-2 mr-2" onClick={onClose}>戻る</button>
-//                     <button className="bg-blue-500 text-white px-4 py-2" onClick={handleSubmit}>保存する</button>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
 
 export default WorkModal;
