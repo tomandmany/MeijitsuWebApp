@@ -1,6 +1,5 @@
 interface WorkNameCellProps {
   name: string;
-  createdAt: string;
 }
 
 const WorkNameCell = ({ name }: WorkNameCellProps) => {
