@@ -14,7 +14,7 @@ const WorkRawBase = ({ memberName }: WorkRawBaseProps) => {
             <WorkSquare isBold />
             {
                 Array.from({ length: 60 }).map((_, index) => (
-                    <WorkSquarePair key={index} isBold={(index + 1) % 2 === 0} memberName={memberName} />
+                    <WorkSquarePair key={index} isBold={(index + 1) % 2 === 0} memberName={memberName} timeIndex={index} />
                 ))
             }
             <WorkSquare />
