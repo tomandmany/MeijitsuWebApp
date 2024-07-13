@@ -15,14 +15,15 @@ const generateTimeOptions = (startHour: number, endHour: number, interval: numbe
         for (let minute = 0; minute < 60; minute += interval) {
             if (hour !== 22 || minute === 0) {
                 const time = `${hour}:${minute.toString().padStart(2, '0')}`;
-                options.push({ value: time, label: time });
+                options.push(time);
             }
         }
     }
     return options;
 };
 
-const fullOptions = generateTimeOptions(7, 22, 15); // 7:00〜22:00
+const startOptions = generateTimeOptions(7, 21, 15); // 7:00〜21:45
+const endOptions = generateTimeOptions(7, 22, 15); // 7:15〜22:00
 
 const WorkModal = () => {
     const context = useContext(WorkContext);
@@ -37,41 +38,14 @@ const WorkModal = () => {
         endTime: ""
     });
 
-    const [startOptions, setStartOptions] = useState<{ value: string, label: string }[]>([]);
-    const [endOptions, setEndOptions] = useState<{ value: string, label: string }[]>([]);
-
     useEffect(() => {
-        if (currentWorkName && currentStartTime && currentEndTime) {
-            setFormData(prevState => ({ ...prevState, workName: currentWorkName, startTime: currentStartTime, endTime: currentEndTime }));
-        } else {
-            setFormData(prevState => ({ ...prevState, startTime: currentStartTime, endTime: currentEndTime }));
-        }
+        setFormData(prevState => ({
+            ...prevState,
+            workName: currentWorkName || "",
+            startTime: currentStartTime || "",
+            endTime: currentEndTime || ""
+        }));
     }, [currentWorkName, currentStartTime, currentEndTime]);
-
-    useEffect(() => {
-        setStartOptions(fullOptions);
-        setEndOptions(fullOptions);
-    }, []);
-
-    useEffect(() => {
-        if (formData.startTime) {
-            const startIndex = fullOptions.findIndex(option => option.value === formData.startTime);
-            const newEndOptions = fullOptions.slice(startIndex + 1); // 開始時間より後の時間のみを終了時間の選択肢に設定
-            setEndOptions(newEndOptions);
-        } else {
-            setEndOptions(fullOptions);
-        }
-    }, [formData.startTime]);
-
-    useEffect(() => {
-        if (formData.endTime) {
-            const endIndex = fullOptions.findIndex(option => option.value === formData.endTime);
-            const newStartOptions = fullOptions.slice(0, endIndex); // 終了時間より前の時間のみを開始時間の選択肢に設定
-            setStartOptions(newStartOptions);
-        } else {
-            setStartOptions(fullOptions);
-        }
-    }, [formData.endTime]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -156,46 +130,26 @@ const WorkModal = () => {
                     <div>
                         <label htmlFor="workName" className="block mb-1 text-black dark:text-white">シフト名</label>
                         <select id="workName" name="workName" className="min-w-full" onChange={handleChange} value={formData.workName}>
-                            {
-                                currentWorkName
-                                    ?
-                                    <option value={currentWorkName}>{currentWorkName}</option>
-                                    :
-                                    <option value="">選択してください</option>
-                            }
-                            {
-                                currentWorkName
-                                    ?
-                                    workModels
-                                        .filter((workModel) => workModel.name !== currentWorkName)
-                                        .map((workModel) => (
-                                            <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
-                                        ))
-                                    :
-                                    workModels.map((workModel) => (
-                                        <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
-                                    ))
-                            }
+                            <option value="">選択してください</option>
+                            {workModels.map((workModel) => (
+                                <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
+                            ))}
                         </select>
                     </div>
                     <div>
                         <label htmlFor="startTime" className="block mb-1 text-black dark:text-white">開始時間</label>
                         <select id="startTime" name="startTime" className="min-w-full" onChange={handleChange} value={formData.startTime}>
-                            {
-                                startOptions.map((startOption) => (
-                                    <option key={startOption.label} value={startOption.value}>{startOption.value}</option>
-                                ))
-                            }
+                            {startOptions.map((startOption) => (
+                                <option key={startOption} value={startOption}>{startOption}</option>
+                            ))}
                         </select>
                     </div>
                     <div>
                         <label htmlFor="endTime" className="block mb-1 text-black dark:text-white">終了時間</label>
                         <select id="endTime" name="endTime" className="min-w-full" onChange={handleChange} value={formData.endTime}>
-                            {
-                                endOptions.map((endOption) => (
-                                    <option key={endOption.label} value={endOption.value}>{endOption.value}</option>
-                                ))
-                            }
+                            {endOptions.map((endOption) => (
+                                <option key={endOption} value={endOption}>{endOption}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
