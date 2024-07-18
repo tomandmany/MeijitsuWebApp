@@ -3,7 +3,7 @@
 
 import { supabase } from '@/lib/supabaseClient';
 import { TablesInsert } from '@/types/supabase.types';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 interface Response {
   success: boolean;
@@ -77,7 +77,8 @@ export default async function createMemberWork(
     return { success: false, error: insertError, data: null };
   }
 
-  revalidatePath('/works');
+  // revalidatePath('/works');
+  revalidateTag('memberWorks');
 
   console.log('Inserted data:', data);
 

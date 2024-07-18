@@ -3,7 +3,7 @@
 
 import { supabase } from '@/lib/supabaseClient';
 import { TablesUpdate } from '@/types/supabase.types';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 interface Response {
   success: boolean;
@@ -79,7 +79,8 @@ export default async function updateMemberWork(
     return { success: false, error: updateError, data: null };
   }
 
-  revalidatePath('/works');
+  // revalidatePath('/works');
+  revalidateTag('memberWorks');
 
   return { success: true, data };
 }

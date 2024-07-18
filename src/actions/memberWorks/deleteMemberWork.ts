@@ -2,7 +2,7 @@
 'use server';
 
 import { supabase } from '@/lib/supabaseClient';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 interface Response {
   success: boolean;
@@ -52,7 +52,8 @@ export default async function deleteMemberWork(
     return { success: false, error: deleteError };
   }
 
-  revalidatePath('/works');
+  // revalidatePath('/works');
+  revalidateTag('memberWorks');
 
   return { success: true };
 }
