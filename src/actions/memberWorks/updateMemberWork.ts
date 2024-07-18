@@ -79,7 +79,7 @@ export default async function updateMemberWork(
     return { success: false, error: updateError, data: null };
   }
 
-  revalidatePath('/');
+  revalidatePath('/works');
 
   return { success: true, data };
 }

@@ -52,7 +52,7 @@ export default async function deleteMemberWork(
     return { success: false, error: deleteError };
   }
 
-  revalidatePath('/');
+  revalidatePath('/works');
 
   return { success: true };
 }

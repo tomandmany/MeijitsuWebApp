@@ -77,7 +77,7 @@ export default async function createMemberWork(
     return { success: false, error: insertError, data: null };
   }
 
-  revalidatePath('/');
+  revalidatePath('/works');
 
   console.log('Inserted data:', data);
 
