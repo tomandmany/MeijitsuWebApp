@@ -21,18 +21,18 @@ const timeList = generateTimeOptions(7, 22, 15);
 
 type WorkSquarePairProps = {
     isBold: boolean;
-    memberName: string;
+    memberId: string;
     timeIndex: number;
 };
 
-const WorkSquarePair = ({ isBold, memberName, timeIndex }: WorkSquarePairProps) => {
+const WorkSquarePair = ({ isBold, memberId, timeIndex }: WorkSquarePairProps) => {
     const context = useContext(WorkContext);
 
     if (!context) {
         throw new Error('WorkSquarePair must be used within a WorkProvider');
     }
 
-    const { handleOpenModal, setCurrentMemberName, setCurrentWorkName, setCurrentStartTime, setCurrentEndTime } = context;
+    const { handleOpenModal, setCurrentMemberId, setCurrentWorkModelId, setCurrentStartTime, setCurrentEndTime } = context;
 
     const handleClick = () => {
         if (timeIndex >= 0 && timeIndex < timeList.length) {
@@ -42,10 +42,10 @@ const WorkSquarePair = ({ isBold, memberName, timeIndex }: WorkSquarePairProps) 
                 ? timeList[endTimeIndex]
                 : timeList[timeIndex];
 
-            setCurrentWorkName('');
+            setCurrentWorkModelId('');
             setCurrentStartTime(startTime);
             setCurrentEndTime(endTime);
-            setCurrentMemberName(memberName); // 現在のメンバー名を設定
+            setCurrentMemberId(memberId); // 現在のメンバー名を設定
             handleOpenModal();
         } else {
             console.error("Invalid timeIndex:", timeIndex);

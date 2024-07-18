@@ -28,7 +28,7 @@ const WorkBody = () => {
   return (
     <>
       {members.map((member) => (
-        <WorkRaw key={member.id} memberName={member.name}>
+        <WorkRaw key={member.id} memberId={member.id}>
           {memberWorks
             .filter((memberWork) => memberWork.memberId === member.id)
             .map((memberWork) => {
@@ -38,7 +38,7 @@ const WorkBody = () => {
                   key={memberWork.id}
                   width={width}
                   left={left}
-                  memberName={member.name}
+                  memberId={member.id}
                   workModelId={memberWork.workModelId}
                   startTime={memberWork.startTime}
                   endTime={memberWork.endTime}

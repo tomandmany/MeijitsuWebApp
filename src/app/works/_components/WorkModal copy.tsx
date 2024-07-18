@@ -30,10 +30,10 @@ const WorkModal = () => {
     if (!context) {
         throw new Error('WorkModal must be used within a WorkProvider');
     }
-    const { workModels, handleCloseModal, currentMemberId, currentWorkModelId, currentStartTime, currentEndTime } = context;
+    const { workModels, handleCloseModal, currentMemberName, currentWorkName, currentStartTime, currentEndTime } = context;
 
     const [formData, setFormData] = useState({
-        workModelId: "",
+        workName: "",
         startTime: "",
         endTime: ""
     });
@@ -41,11 +41,11 @@ const WorkModal = () => {
     useEffect(() => {
         setFormData(prevState => ({
             ...prevState,
-            workModelId: currentWorkModelId || "",
+            workName: currentWorkName || "",
             startTime: currentStartTime || "",
             endTime: currentEndTime || ""
         }));
-    }, [currentWorkModelId, currentStartTime, currentEndTime]);
+    }, [currentWorkName, currentStartTime, currentEndTime]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -54,11 +54,11 @@ const WorkModal = () => {
 
     const handleInsert = async () => {
         const form = new FormData();
-        form.append('workModelId', formData.workModelId);
-        console.log('Inserting workModelId:', formData.workModelId);  // デバッグ用
+        form.append('workName', formData.workName);
+        console.log('Inserting workName:', formData.workName);  // デバッグ用
         form.append('startTime', formData.startTime);
         form.append('endTime', formData.endTime);
-        form.append('memberId', currentMemberId); // メンバーIDを追加
+        form.append('memberName', currentMemberName); // メンバー名を追加
 
         const response = await createMemberWork(form);
         console.log('Server response:', response); // デバッグ用
@@ -73,11 +73,11 @@ const WorkModal = () => {
 
     const handleUpdate = async () => {
         const form = new FormData();
-        form.append('workModelId', formData.workModelId);
-        console.log('Updating workModelId:', formData.workModelId);  // デバッグ用
+        form.append('workName', formData.workName);
+        console.log('Updating workName:', formData.workName);  // デバッグ用
         form.append('startTime', formData.startTime);
         form.append('endTime', formData.endTime);
-        form.append('memberId', currentMemberId); // メンバーIDを追加
+        form.append('memberName', currentMemberName); // メンバー名を追加
 
         const response = await updateMemberWork(form);
         console.log('Server response:', response); // デバッグ用
@@ -92,12 +92,12 @@ const WorkModal = () => {
 
     const handleDelete = async () => {
         const form = new FormData();
-        form.append('memberId', currentMemberId);
-        form.append('workModelId', formData.workModelId);
+        form.append('memberName', currentMemberName);
+        form.append('workName', formData.workName);
         form.append('startTime', formData.startTime);
         form.append('endTime', formData.endTime);
 
-        console.log('Deleting workModelId:', formData.workModelId);  // デバッグ用
+        console.log('Deleting workName:', formData.workName);  // デバッグ用
 
         const response = await deleteMemberWork(form);
         console.log('Server response:', response); // デバッグ用
@@ -128,11 +128,11 @@ const WorkModal = () => {
                 </Button>
                 <div className="flex flex-col gap-4">
                     <div>
-                        <label htmlFor="workModelId" className="block mb-1 text-black dark:text-white">シフト名</label>
-                        <select id="workModelId" name="workModelId" className="min-w-full" onChange={handleChange} value={formData.workModelId}>
+                        <label htmlFor="workName" className="block mb-1 text-black dark:text-white">シフト名</label>
+                        <select id="workName" name="workName" className="min-w-full" onChange={handleChange} value={formData.workName}>
                             <option value="">選択してください</option>
                             {workModels.map((workModel) => (
-                                <option key={workModel.id} value={workModel.id}>{workModel.name}</option>
+                                <option key={workModel.name} value={workModel.name}>{workModel.name}</option>
                             ))}
                         </select>
                     </div>
@@ -163,7 +163,7 @@ const WorkModal = () => {
                         削除する
                     </Button>
                     {
-                        currentWorkModelId
+                        currentWorkName
                             ?
                             (
                                 <Button

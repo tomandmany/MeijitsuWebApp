@@ -9,10 +9,10 @@ interface WorkContextType {
     isModalOpen: boolean;
     handleOpenModal: () => void;
     handleCloseModal: () => void;
-    currentMemberName: string;
-    setCurrentMemberName: (name: string) => void;
-    currentWorkName: string;
-    setCurrentWorkName: (name: string) => void;
+    currentMemberId: string;
+    setCurrentMemberId: (name: string) => void;
+    currentWorkModelId: string;
+    setCurrentWorkModelId: (name: string) => void;
     currentStartTime: string;
     setCurrentStartTime: (startTime: string) => void;
     currentEndTime: string;
