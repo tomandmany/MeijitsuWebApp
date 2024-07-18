@@ -1,15 +1,17 @@
-import { unstable_cache } from 'next/cache';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
-export const getMembers = unstable_cache(
-  async () => {
-    const { data, error } = await supabase.from('members').select('*');
-    if (error) {
-      console.error('Error fetching members:', error);
-      return [];
-    }
-    return data;
-  },
-  ['members'],
-  { tags: ['members'], revalidate: 60 } // キャッシュを60秒間保持
-);
+export async function getMembers() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data, error } = await supabase
+    .from('members')
+    .select('*')
+    .order('createdAt', { ascending: false });
+  if (error) {
+    console.error('Error fetching members:', error);
+    return [];
+  }
+  return data;
+}

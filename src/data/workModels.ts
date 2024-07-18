@@ -1,18 +1,17 @@
-// /data/workModels.ts
-// @filename: /data/workModels.ts
+import { createClient } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabaseClient';
-import { unstable_cache } from 'next/cache';
-
-export const getWorkModels = unstable_cache(
-  async () => {
-    const { data, error } = await supabase.from('workModels').select('*');
-    if (error) {
-      console.error('Error fetching workModels:', error);
-      return [];
-    }
-    return data;
-  },
-  ['workModels'],
-  { tags: ['workModels'], revalidate: 60 }
-);
+export async function getWorkModels() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data, error } = await supabase
+    .from('workModels')
+    .select('*')
+    .order('createdAt', { ascending: false });
+  if (error) {
+    console.error('Error fetching workModels:', error);
+    return [];
+  }
+  return data;
+}
