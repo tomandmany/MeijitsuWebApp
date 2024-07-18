@@ -10,19 +10,20 @@ type WorkBlockProps = {
     left: number;
     startTime: string;
     endTime: string;
+    memberWorkId: string;
     memberId: string;
     workModelId: string;
     isTime?: boolean;
 };
 
-export default function WorkBlock({ width, left, startTime, endTime, workModelId, memberId }: WorkBlockProps) {
+export default function WorkBlock({ width, left, startTime, endTime, memberWorkId, workModelId, memberId }: WorkBlockProps) {
     const { theme } = useTheme();
 
     const workContext = useContext(WorkContext);
     if (!workContext) {
         throw new Error('WorkBlock must be used within a WorkProvider');
     }
-    const { workModels, handleOpenModal, setCurrentMemberId, setCurrentWorkModelId, setCurrentStartTime, setCurrentEndTime } = workContext;
+    const { workModels, handleOpenModal, setCurrentMemberWorkId, setCurrentMemberId, setCurrentWorkModelId, setCurrentStartTime, setCurrentEndTime } = workContext;
 
     const currentWorkModel = workModels.find((workModel) => workModel.id === workModelId);
 
@@ -41,6 +42,7 @@ export default function WorkBlock({ width, left, startTime, endTime, workModelId
         : currentWorkModel?.color;
     
     const handleClick = () => {
+        setCurrentMemberWorkId(memberWorkId);
         setCurrentMemberId(memberId);
         setCurrentWorkModelId(workModelId);
         setCurrentStartTime(startTime);

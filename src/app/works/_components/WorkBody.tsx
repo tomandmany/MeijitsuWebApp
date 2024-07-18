@@ -38,6 +38,7 @@ const WorkBody = () => {
                   key={memberWork.id}
                   width={width}
                   left={left}
+                  memberWorkId={memberWork.id}
                   memberId={member.id}
                   workModelId={memberWork.workModelId}
                   startTime={memberWork.startTime}

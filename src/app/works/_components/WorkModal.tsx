@@ -30,7 +30,7 @@ const WorkModal = () => {
     if (!context) {
         throw new Error('WorkModal must be used within a WorkProvider');
     }
-    const { workModels, handleCloseModal, currentMemberId, currentWorkModelId, currentStartTime, currentEndTime } = context;
+    const { workModels, handleCloseModal, currentMemberWorkId, currentMemberId, currentWorkModelId, currentStartTime, currentEndTime } = context;
 
     const [formData, setFormData] = useState({
         workModelId: "",
@@ -73,6 +73,7 @@ const WorkModal = () => {
 
     const handleUpdate = async () => {
         const form = new FormData();
+        form.append('memberWorkId', currentMemberWorkId);
         form.append('workModelId', formData.workModelId);
         console.log('Updating workModelId:', formData.workModelId);  // デバッグ用
         form.append('startTime', formData.startTime);
@@ -92,6 +93,7 @@ const WorkModal = () => {
 
     const handleDelete = async () => {
         const form = new FormData();
+        form.append('memberWorkId', currentMemberWorkId);
         form.append('memberId', currentMemberId);
         form.append('workModelId', formData.workModelId);
         form.append('startTime', formData.startTime);

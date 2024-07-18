@@ -14,6 +14,7 @@ interface WorkProviderProps {
 
 const WorkProvider = ({ members, memberWorks, workModels, children }: WorkProviderProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentMemberWorkId, setCurrentMemberWorkId] = useState('');
     const [currentMemberId, setCurrentMemberId] = useState('');
     const [currentWorkModelId, setCurrentWorkModelId] = useState('');
     const [currentStartTime, setCurrentStartTime] = useState('');
@@ -28,7 +29,7 @@ const WorkProvider = ({ members, memberWorks, workModels, children }: WorkProvid
     };
 
     return (
-        <WorkContext.Provider value={{ members, workModels, memberWorks, isModalOpen, handleOpenModal, handleCloseModal, currentMemberId, setCurrentMemberId, currentWorkModelId, setCurrentWorkModelId, currentStartTime, setCurrentStartTime, currentEndTime, setCurrentEndTime }}>
+        <WorkContext.Provider value={{ members, workModels, memberWorks, isModalOpen, handleOpenModal, handleCloseModal, currentMemberWorkId, setCurrentMemberWorkId, currentMemberId, setCurrentMemberId, currentWorkModelId, setCurrentWorkModelId, currentStartTime, setCurrentStartTime, currentEndTime, setCurrentEndTime }}>
             {children}
         </WorkContext.Provider>
     );

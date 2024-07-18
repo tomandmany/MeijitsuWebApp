@@ -14,44 +14,19 @@ interface Response {
 export default async function updateMemberWork(
   formData: FormData
 ): Promise<Response> {
-  const memberName = formData.get('memberName') as string;
-  const { data: memberData, error: memberError } = await supabase
-    .from('members')
-    .select('id')
-    .eq('name', memberName)
-    .maybeSingle();
-
-  if (memberError || !memberData) {
-    console.error('Error finding member:', memberError);
-    return { success: false, error: 'Error finding member', data: null };
-  }
-
-  const memberId = memberData.id;
-
-  const workName = formData.get('workName') as string;
-  const { data: workModelData, error: workModelError } = await supabase
-    .from('workModels')
-    .select('id')
-    .eq('name', workName)
-    .maybeSingle();
-
-  if (workModelError || !workModelData) {
-    console.error('Error finding workModel:', workModelError);
-    return { success: false, error: 'Error finding workModel', data: null };
-  }
-  const workModelId = workModelData.id;
-
-  const startTime = formData.get('startTime') as string;
-  const endTime = formData.get('endTime') as string;
+  const updatedMemberWork: Omit<TablesUpdate<'memberWorks'>, 'createdAt'> = {
+    workModelId: formData.get('workModelId') as string,
+    memberId: formData.get('memberId') as string,
+    startTime: formData.get('startTime') as string,
+    endTime: formData.get('endTime') as string,
+  };
 
   const { data: memberWorkData, error: memberWorkError } = await supabase
     .from('memberWorks')
     .select('id')
-    .eq('workModelId', workModelId)
-    .eq('memberId', memberId)
-    .single();
+    .eq('id', formData.get('memberWorkId') as string);
 
-  if (memberWorkError || !memberWorkData) {
+  if (memberWorkError || !memberWorkData || memberWorkData.length === 0) {
     console.error('Error finding memberWork:', memberWorkError);
     return {
       success: false,
@@ -60,17 +35,12 @@ export default async function updateMemberWork(
     };
   }
 
-  const updatedMemberWork: Omit<TablesUpdate<'memberWorks'>, 'createdAt'> = {
-    workModelId: workModelId,
-    memberId: memberId,
-    startTime: startTime,
-    endTime: endTime,
-  };
+  const memberWorkId = memberWorkData[0].id; // 最初の行のIDを使用
 
   const { data, error: updateError } = await supabase
     .from('memberWorks')
     .update(updatedMemberWork)
-    .eq('id', memberWorkData.id)
+    .eq('id', memberWorkId)
     .select()
     .maybeSingle();
 
