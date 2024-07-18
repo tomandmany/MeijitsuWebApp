@@ -10,8 +10,6 @@ export async function getMemberWorks() {
     console.error('Error fetching memberWorks:', error);
     return [];
   }
-  
-  revalidatePath('/works');
 
   return data;
 }
